@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-22 — Link alla pagina del programma
+
+- **In basso a destra nella finestra** ora ci sono la versione e il link alla pagina del programma
+  (per ora il repository GitHub, poi il sito del progetto): un clic lo apre nel browser.
+
 ## 2026-09-22 — Nuova icona (0.1.1)
 
 - **Icona ridisegnata**: una nuvola bianca da cui scende una freccia dorata dentro un vassoio (i file

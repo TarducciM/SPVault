@@ -57,6 +57,7 @@ import sys
 import threading
 import time
 import tkinter as tk
+import webbrowser
 from collections import Counter, defaultdict
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from dataclasses import dataclass
@@ -1642,6 +1643,8 @@ def run_backup(cfg: dict, log, progress, cancel: threading.Event, interactive_lo
 # ------------------------------------------------------------------------- GUI
 
 ICON_FILES = ("spvault.png", "spvault.ico")  # in assets\, disegnate da assets\make_icon.py
+# Pagina del programma, linkata in basso a destra nella finestra (poi il sito del progetto)
+WEBSITE = "https://github.com/TarducciM/SPVault"
 
 
 def asset_path(name: str) -> Path:
@@ -1765,12 +1768,17 @@ class App:
         self.log_box.grid(row=7, column=0, columnspan=3, sticky="nsew", pady=(8, 8))
 
         sched = ttk.Frame(frm)
-        sched.grid(row=8, column=0, columnspan=3, sticky="w")
+        sched.grid(row=8, column=0, columnspan=3, sticky="ew")
         ttk.Label(sched, text=tr("Backup automatico ogni giorno alle")).pack(side="left")
         ttk.Entry(sched, textvariable=self.var_time, width=6).pack(side="left", padx=4)
         ttk.Button(sched, text=tr("Pianifica"), command=self._schedule).pack(side="left")
         ttk.Button(sched, text=tr("Rimuovi"), command=self._unschedule).pack(side="left", padx=6)
         ttk.Label(sched, textvariable=self.var_sched, foreground="gray").pack(side="left")
+        # in basso a destra: versione e pagina del programma, cliccabile
+        self.link = ttk.Label(sched, text=f"SPVault {__version__} · {WEBSITE.split('://', 1)[1]}",
+                              foreground="#2563EB", cursor="hand2", font=("Segoe UI", 8, "underline"))
+        self.link.pack(side="right")
+        self.link.bind("<Button-1>", lambda _event: self._open_website())
 
     # --- lingua
 
@@ -2090,6 +2098,9 @@ class App:
     def _tick(self):
         self._show_status()
         self._tick_job = self.root.after(500, self._tick)
+
+    def _open_website(self):
+        webbrowser.open(WEBSITE)
 
     def _browse(self):
         path = filedialog.askdirectory(initialdir=self.var_dest.get() or Path.home())

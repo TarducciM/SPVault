@@ -93,3 +93,13 @@ def test_selection_is_saved(server, make_app):
 
 def test_self_test_passes():
     assert self_test() == 0
+
+
+def test_website_link_in_the_bottom_right_corner(make_app, monkeypatch):
+    opened = []
+    monkeypatch.setattr(spb.webbrowser, "open", opened.append)
+    app = make_app()
+    assert app.link.cget("text") == f"SPVault {spb.__version__} · {spb.WEBSITE.split('://', 1)[1]}"
+    assert str(app.link.cget("cursor")) == "hand2"
+    app._open_website()
+    assert opened == [spb.WEBSITE]
