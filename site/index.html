@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPVault — verified SharePoint &amp; OneDrive backup for Windows</title>
+<meta name="description" content="SPVault backs up a SharePoint library, folder, or OneDrive for Business file by file from your own browser session — only what changed, with kept versions and a byte-level completeness check every run. No admin account, no Azure app. Free and open source.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:title" content="SPVault">
+<meta property="og:description" content="Verified, incremental SharePoint and OneDrive for Business backup for Windows. Local-first, open source, no admin account needed.">
+<meta property="og:image" content="social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700;800&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2026-09-22">
+</head>
+<body>
+
+<div class="wrap">
+  <header class="site">
+    <a class="brand" href="#top">
+      <svg class="mark" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="bgg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#22B98A"/>
+            <stop offset="1" stop-color="#064A3A"/>
+          </linearGradient>
+        </defs>
+        <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#bgg)"/>
+        <g transform="translate(512 546) scale(0.86) translate(-512 -512)">
+          <mask id="cloud" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+            <g fill="#fff"><circle cx="354" cy="402" r="118"/><circle cx="502" cy="302" r="170"/><circle cx="650" cy="382" r="138"/><rect x="354" y="402" width="296" height="118"/></g>
+            <g fill="#000"><circle cx="354" cy="402" r="72"/><circle cx="502" cy="302" r="124"/><circle cx="650" cy="382" r="92"/><rect x="354" y="302" width="296" height="172"/></g>
+            <rect x="440" y="434" width="144" height="126" fill="#000"/>
+          </mask>
+          <rect width="1024" height="1024" fill="#ffffff" mask="url(#cloud)"/>
+          <circle cx="440" cy="497" r="23" fill="#ffffff"/><circle cx="584" cy="497" r="23" fill="#ffffff"/>
+          <path d="M512 400 V670 M440 598 L512 670 L584 598" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FBBF24" stroke-width="50"/>
+          <path d="M300 676 V742 Q300 790 348 790 H676 Q724 790 724 742 V676" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#ffffff" stroke-width="46"/>
+        </g>
+      </svg>
+      <span class="word">SPVault</span>
+    </a>
+    <nav class="header-links">
+      <nav class="lang-switch" aria-label="Lingua / Language">
+        <button type="button" data-lang-switch="it">IT</button>
+        <button type="button" data-lang-switch="en">EN</button>
+      </nav>
+      <span class="version-pill" id="version-pill">…</span>
+      <a href="https://github.com/TarducciM/SPVault" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span data-i18n="nav.github">GitHub</span>
+      </a>
+    </nav>
+  </header>
+</div>
+
+<main id="top">
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow" data-i18n="hero.eyebrow">backup sharepoint · windows · open source</div>
+      <h1><span data-i18n="hero.title_pre">Il backup di SharePoint che </span><em data-i18n="hero.title_em">ti dice se manca qualcosa.</em></h1>
+      <p class="hero-sub" data-i18n="hero.sub">SPVault copia file per file una libreria SharePoint, una sua cartella o OneDrive for Business — solo quello che è cambiato, con le versioni precedenti conservate e una verifica al byte a ogni backup. Nessun account amministratore, nessuna app registrata su Azure: basta poter aprire i file nel browser.</p>
+      <div class="cta-row">
+        <a class="btn-primary" id="primary-download" href="https://github.com/TarducciM/SPVault">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13m0 0 5-5m-5 5-5-5M4 21h16"/></svg>
+          <span id="primary-download-label" data-i18n="hero.cta_primary_fallback">Vedi il progetto su GitHub</span>
+        </a>
+        <a class="btn-secondary" href="#downloads" data-i18n="hero.cta_secondary">Altri file</a>
+        <a class="btn-secondary" href="https://github.com/TarducciM/SPVault#readme" target="_blank" rel="noopener" data-i18n="hero.cta_readme">Elenco completo delle funzioni ↗</a>
+      </div>
+      <p class="hero-note" data-i18n="hero.note">Windows 10/11, 64-bit. Richiede Google Chrome o Microsoft Edge (già installato).</p>
+
+      <div class="demo" aria-hidden="true">
+        <div class="demo-chrome"><span></span><span></span><span></span><span class="label" data-i18n="demo.window_label">SPVault — backup</span></div>
+        <div class="demo-log">
+          <div class="step"><span data-i18n="demo.step1">Accesso a SharePoint</span><span class="ok">OK</span></div>
+          <div class="step"><span data-i18n="demo.step2">Lettura delle modifiche</span><span data-i18n="demo.step2_val">3 file cambiati</span></div>
+          <div class="step"><span data-i18n="demo.step3">Download 3/3</span><span class="bar">████████████ 100%</span></div>
+          <div class="step"><span data-i18n="demo.step4">Verifica dei file su disco</span><span class="ok">OK</span></div>
+          <hr>
+          <div class="verdict" data-i18n="demo.verdict">VERIFICA OK — 12.482 file (86,4 GB)</div>
+          <div class="verdict-sub" data-i18n="demo.verdict_sub">tutti identici a SharePoint, incluse le sottocartelle non lette dall’ultimo backup.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="features.eyebrow">cosa fa</div>
+        <h2 data-i18n="features.title">Un backup non è tale se non sai cosa manca.</h2>
+        <p data-i18n="features.sub">Il download a mano dal browser (zip) non avvisa se qualcosa manca e riscarica sempre tutto. SPVault copia solo le differenze e controlla di aver preso tutto, ogni volta.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature">
+          <span class="tok" data-i18n="features.f1_tok">Δ</span>
+          <h3 data-i18n="features.f1_title">Solo quello che è cambiato</h3>
+          <p data-i18n="features.f1_desc">L’hash del contenuto calcolato da SharePoint dice cosa scaricare davvero: un file identico non viene mai riscaricato, uno spostato viene solo spostato in locale.</p>
+        </div>
+        <div class="feature">
+          <span class="tok" data-i18n="features.f2_tok">N</span>
+          <h3 data-i18n="features.f2_title">Versioni, non copie intere</h3>
+          <p data-i18n="features.f2_desc">Ogni backup mette in _Versions\ solo i file cambiati o eliminati, non l’intera cartella: dieci versioni occupano poco più di una copia sola.</p>
+        </div>
+        <div class="feature">
+          <span class="tok" data-i18n="features.f3_tok">✓</span>
+          <h3 data-i18n="features.f3_title">Verifica al byte, ogni volta</h3>
+          <p data-i18n="features.f3_desc">La dimensione che SharePoint dichiara per ogni cartella è confrontata al byte con quello che c’è davvero sul disco: quello che manca viene ripreso subito, non scoperto dopo.</p>
+        </div>
+        <div class="feature">
+          <span class="tok" data-i18n="features.f4_tok">OSPITE</span>
+          <h3 data-i18n="features.f4_title">Funziona anche da ospite</h3>
+          <p data-i18n="features.f4_desc">Usa la sessione del browser che hai già — niente app registrata su Azure, niente consenso di un amministratore, niente client OneDrive.</p>
+        </div>
+        <div class="feature">
+          <span class="tok" data-i18n="features.f5_tok">AUTO</span>
+          <h3 data-i18n="features.f5_title">Parte da solo</h3>
+          <p data-i18n="features.f5_desc">Backup giornaliero pianificato senza permessi da amministratore. Se il PC era spento all’orario previsto, riparte alla riaccensione.</p>
+        </div>
+        <div class="feature">
+          <span class="tok" data-i18n="features.f6_tok">DISK</span>
+          <h3 data-i18n="features.f6_title">Poco spazio sul disco? Va bene lo stesso</h3>
+          <p data-i18n="features.f6_desc">Con la cartella di backup dentro OneDrive, SPVault scarica a blocchi: carica e libera spazio man mano invece di aver bisogno di tutto il disco in una volta.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="downloads" id="downloads">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="downloads.eyebrow">scarica</div>
+        <h2 data-i18n="downloads.title">Scegli il file.</h2>
+        <p id="downloads-sub" data-i18n="downloads.checking">Verifico l’ultima release su GitHub…</p>
+      </div>
+      <div class="platform-grid" id="platform-grid" hidden>
+        <!-- popolato da JS quando esiste una release -->
+      </div>
+      <div class="no-release" id="no-release" hidden>
+        <h3 data-i18n="downloads.no_release_title">Nessuna versione installabile ancora</h3>
+        <p data-i18n="downloads.no_release_body">Metti una stella al repository o segui le release per sapere subito quando esce la prima versione.</p>
+        <a class="btn-secondary" href="https://github.com/TarducciM/SPVault" target="_blank" rel="noopener" data-i18n="downloads.star">Metti una stella su GitHub ↗</a>
+        <a class="btn-secondary" href="https://github.com/TarducciM/SPVault/releases" target="_blank" rel="noopener" data-i18n="downloads.watch">Segui le release ↗</a>
+      </div>
+      <p class="requirements" data-i18n="downloads.requirements">Serve Windows 10/11 a 64 bit e Google Chrome o Microsoft Edge già installato.</p>
+      <noscript>
+        <p style="color:var(--text-dim); font-size:14px;">JavaScript è disattivato, quindi questa pagina non può controllare da sola l’ultima release — vai direttamente alla <a href="https://github.com/TarducciM/SPVault/releases" style="color:var(--accent-soft);">pagina delle release</a>.</p>
+      </noscript>
+      <p class="all-releases"><span data-i18n="downloads.all_releases_pre">Versioni precedenti e changelog completo sulla</span> <a href="https://github.com/TarducciM/SPVault/releases" target="_blank" rel="noopener" data-i18n="downloads.all_releases_link">pagina delle release ↗</a></p>
+    </section>
+  </div>
+</main>
+
+<div class="wrap">
+  <footer class="site">
+    <div class="footer-row">
+      <span><span data-i18n="footer.license">Con licenza MIT. Realizzato da</span> <a href="https://github.com/TarducciM" target="_blank" rel="noopener">Michele Tarducci</a>.</span>
+      <div class="footer-links">
+        <a href="https://github.com/TarducciM/SPVault" target="_blank" rel="noopener" data-i18n="footer.source">Sorgente</a>
+        <a href="https://github.com/TarducciM/SPVault/issues" target="_blank" rel="noopener" data-i18n="footer.issues">Segnala un problema</a>
+        <a href="https://github.com/TarducciM/SPVault/blob/main/LICENSE" target="_blank" rel="noopener" data-i18n="footer.license_link">Licenza</a>
+        <a href="privacy.html" data-i18n="footer.privacy">Privacy</a>
+        <a href="terms.html" data-i18n="footer.terms">Termini</a>
+        <a href="cookie-policy.html" data-i18n="footer.cookie">Cookie Policy</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script src="i18n.js?v=2026-09-22"></script>
+<script>
+(function () {
+  'use strict';
+
+  var REPO = 'TarducciM/SPVault';
+  var API_URL = 'https://api.github.com/repos/' + REPO + '/releases/latest';
+  var t = function (key) { return window.SPVaultI18n ? window.SPVaultI18n.t(key) : key; };
+
+  var PLATFORMS = [
+    {
+      id: 'msi', nameKey: 'downloads.msi_name', descKey: 'downloads.msi_desc',
+      match: function (a) { return /_x64_en-US\.msi$/.test(a.name); },
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8 12 3l9 5v10l-9 5-9-5Z"/><path d="M12 3v10m0 0 9-5M12 13 3 8"/></svg>'
+    },
+    {
+      id: 'portable', nameKey: 'downloads.portable_name', descKey: 'downloads.portable_desc',
+      match: function (a) { return /_x64-portable\.exe$/.test(a.name); },
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>'
+    }
+  ];
+
+  var lastRelease = null;
+
+  function showNoRelease() {
+    document.getElementById('downloads-sub').textContent = t('downloads.no_release_sub');
+    document.getElementById('downloads-sub').removeAttribute('data-i18n');
+    document.getElementById('no-release').hidden = false;
+    document.getElementById('platform-grid').hidden = true;
+  }
+
+  function renderRelease(release) {
+    lastRelease = release;
+    var version = release.tag_name || '';
+    var pill = document.getElementById('version-pill');
+    if (version) pill.textContent = version;
+
+    var assets = release.assets || [];
+    var byId = {};
+    PLATFORMS.forEach(function (p) { byId[p.id] = assets.filter(p.match)[0]; });
+
+    var anyAsset = PLATFORMS.some(function (p) { return byId[p.id]; });
+    if (!anyAsset) { showNoRelease(); return; }
+
+    document.getElementById('no-release').hidden = true;
+    var grid = document.getElementById('platform-grid');
+    grid.hidden = false;
+    grid.innerHTML = '';
+    PLATFORMS.forEach(function (p) {
+      var asset = byId[p.id];
+      var a = document.createElement('a');
+      a.className = 'platform-card';
+      if (asset) {
+        a.href = asset.browser_download_url;
+      } else {
+        a.href = release.html_url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+      }
+      a.innerHTML = p.icon +
+        '<span class="p-name" data-i18n="' + p.nameKey + '">' + t(p.nameKey) + '</span>' +
+        '<span class="p-desc" data-i18n="' + p.descKey + '">' + t(p.descKey) + '</span>' +
+        '<span class="p-file' + (asset ? '' : ' muted') + '">' + (asset ? asset.name : t('downloads.see_release_page')) + '</span>';
+      grid.appendChild(a);
+    });
+
+    var primary = document.getElementById('primary-download');
+    var primaryLabel = document.getElementById('primary-download-label');
+    primaryLabel.removeAttribute('data-i18n');
+    if (byId.msi) {
+      primary.href = byId.msi.browser_download_url;
+      primaryLabel.textContent = t('downloads.primary_label');
+    } else {
+      primary.href = release.html_url;
+      primaryLabel.textContent = t('downloads.primary_label') + ' ' + version;
+    }
+
+    var sub = document.getElementById('downloads-sub');
+    sub.removeAttribute('data-i18n');
+    var dateStr = new Date(release.published_at).toLocaleDateString(
+      window.SPVaultI18n && window.SPVaultI18n.currentLang === 'it' ? 'it-IT' : 'en-US',
+      { year: 'numeric', month: 'long', day: 'numeric' }
+    );
+    sub.textContent = t('downloads.latest_pre') + ' ' + version + ', ' + t('downloads.latest_published') + ' ' + dateStr + '.';
+  }
+
+  window.onSPVaultI18nApply = function () {
+    if (lastRelease) renderRelease(lastRelease);
+  };
+
+  fetch(API_URL, { headers: { Accept: 'application/vnd.github+json' } })
+    .then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(renderRelease)
+    .catch(showNoRelease);
+})();
+</script>
+
+</body>
+</html>

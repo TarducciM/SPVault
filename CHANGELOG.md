@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-22 — Sito del progetto (`site/`)
+
+- **Sito statico in `site/`**: home (hero, pannello con il log di verifica, 6 funzioni, download che
+  legge la release più recente da GitHub), `privacy.html`, `terms.html`, `cookie-policy.html`,
+  `favicon.svg` (icona dell'app) e `social-preview.png` — stessa struttura e stesso spirito dei siti
+  di ClipVault e MD Viewer (nessun account, nessuna telemetria, nessun cookie), ma con un selettore
+  IT/EN condiviso da tutte le pagine (`site/i18n.js`), assente negli altri due.
+- **Contenuto verificato contro il vero comportamento dell'app** (README, non a memoria): accesso via
+  browser dedicato con sessione locale in `%LOCALAPPDATA%\SPVault\browser_profile`, nessun server
+  proprio, nessuna affiliazione Microsoft dichiarata nei termini.
+- **Il selettore lingua riusa fin da subito la correzione strutturale** già trovata su
+  MTSolutions-Sites lo stesso giorno per un bug analogo (la sottolineatura della lingua attiva che
+  sconfina sul separatore "·"): la sigla vive in un `<span class="lang-code">` proprio, mai la
+  decorazione sul bottone — vedi il commento in `site/style.css`.
+- Verificato dal vivo con un server statico locale: le 4 pagine in italiano e inglese, cambio lingua
+  persistito tra pagine (`localStorage`), la sezione download che recupera davvero la release v0.1.1
+  da GitHub (MSI + portabile), nessun errore in console, nessun overflow a 375px.
+- Non ancora online: manca il deploy (DNS + hosting) all'indirizzo proposto
+  `https://spvault.mtsolutions.studio/`.
+
 ## 2026-09-22 — Link alla pagina del programma
 
 - **In basso a destra nella finestra** ora ci sono la versione e il link alla pagina del programma

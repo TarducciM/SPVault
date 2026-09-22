@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — SPVault</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700;800&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2026-09-22">
+</head>
+<body>
+
+<header class="site legal-wrap">
+  <a class="brand" href="index.html">
+    <svg class="mark" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs><linearGradient id="bgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22B98A"/><stop offset="1" stop-color="#064A3A"/></linearGradient></defs>
+      <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#bgg)"/>
+      <g transform="translate(512 546) scale(0.86) translate(-512 -512)">
+        <mask id="cloud" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+          <g fill="#fff"><circle cx="354" cy="402" r="118"/><circle cx="502" cy="302" r="170"/><circle cx="650" cy="382" r="138"/><rect x="354" y="402" width="296" height="118"/></g>
+          <g fill="#000"><circle cx="354" cy="402" r="72"/><circle cx="502" cy="302" r="124"/><circle cx="650" cy="382" r="92"/><rect x="354" y="302" width="296" height="172"/></g>
+          <rect x="440" y="434" width="144" height="126" fill="#000"/>
+        </mask>
+        <rect width="1024" height="1024" fill="#ffffff" mask="url(#cloud)"/>
+        <circle cx="440" cy="497" r="23" fill="#ffffff"/><circle cx="584" cy="497" r="23" fill="#ffffff"/>
+        <path d="M512 400 V670 M440 598 L512 670 L584 598" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FBBF24" stroke-width="50"/>
+        <path d="M300 676 V742 Q300 790 348 790 H676 Q724 790 724 742 V676" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#ffffff" stroke-width="46"/>
+      </g>
+    </svg>
+    <span class="word">SPVault</span>
+  </a>
+  <nav style="display:flex; align-items:center; gap:18px;">
+    <nav class="lang-switch" aria-label="Lingua / Language">
+      <button type="button" data-lang-switch="it">IT</button>
+      <button type="button" data-lang-switch="en">EN</button>
+    </nav>
+    <a href="index.html" style="font-family:var(--mono); font-size:13px; color:var(--text-dim); text-decoration:none;" data-i18n="nav.back">← Indietro</a>
+  </nav>
+</header>
+
+<div class="legal-wrap">
+<main>
+  <div class="eyebrow" data-i18n="privacy.eyebrow">privacy</div>
+  <h1 data-i18n="privacy.title">Informativa sulla privacy</h1>
+  <p class="updated" data-i18n="privacy.updated">Ultimo aggiornamento: 22 settembre 2026</p>
+
+  <p data-i18n="privacy.intro">SPVault è un programma desktop che gira sul tuo PC: non ha un proprio server, non raccoglie dati per venderli o profilarti, e non manda nessuna telemetria. Questa pagina spiega con esattezza cosa succede — e cosa no — in termini semplici.</p>
+
+  <h2 data-i18n="privacy.h2_app">Il programma desktop</h2>
+  <p data-i18n="privacy.app_p1">SPVault gira interamente sul tuo dispositivo. Parla solo con le pagine di accesso di Microsoft (nel browser, alla prima connessione) e con le API di SharePoint del tuo account — niente altro.</p>
+  <ul>
+    <li data-i18n="privacy.app_li1" data-i18n-html><strong>Nessun server proprio, nessuna telemetria.</strong> SPVault non manda a nessun server di sua proprietà informazioni di alcun tipo — non analytics, non crash report, non statistiche d’uso.</li>
+    <li data-i18n="privacy.app_li2" data-i18n-html><strong>L’accesso avviene con il tuo browser.</strong> SPVault apre Chrome o Edge (già installati sul tuo PC) con un profilo dedicato e separato da quello che usi tutti i giorni, in <code>%LOCALAPPDATA%\SPVault\browser_profile</code>. Le credenziali le inserisci tu, direttamente nella pagina di accesso Microsoft — SPVault non le vede né le maneggia mai.</li>
+    <li data-i18n="privacy.app_li3" data-i18n-html><strong>La sessione di accesso resta solo sul tuo PC.</strong> Dopo il primo accesso, SPVault riusa i cookie di sessione salvati in quel profilo dedicato per parlare con le API di SharePoint — non vengono mai inviati altrove.</li>
+    <li data-i18n="privacy.app_li4" data-i18n-html><strong>I dati del backup restano dove li metti tu.</strong> I file copiati vanno nella cartella di backup che scegli, sul tuo disco o dentro il tuo OneDrive — mai su un server di SPVault, perché non esiste.</li>
+    <li data-i18n="privacy.app_li5" data-i18n-html><strong>SPVault vede solo quello che vedi tu.</strong> Usa il tuo account e i tuoi permessi, nessun privilegio aggiuntivo: non può leggere né copiare niente che il tuo account non veda già nel browser.</li>
+    <li data-i18n="privacy.app_li6" data-i18n-html><strong>Disinstallando SPVault</strong> restano i file che ha già copiato (sono tuoi, sul tuo disco) — i dati dell’app (sessione, impostazioni, stato) restano in <code>%LOCALAPPDATA%\SPVault</code> finché non li cancelli a mano.</li>
+  </ul>
+
+  <h2 data-i18n="privacy.h2_site">Questo sito (la pagina che stai leggendo)</h2>
+  <p data-i18n="privacy.site_p1">È un sito statico, senza form, senza account e senza analytics di alcun tipo. Due cose vengono comunque caricate da fuori il tuo browser, entrambe standard e dichiarate onestamente:</p>
+  <ul>
+    <li data-i18n="privacy.site_li1" data-i18n-html><strong>L’API pubblica delle release di GitHub</strong> — per mostrare se esiste già una versione scaricabile e il link giusto. La richiesta va dal tuo browser direttamente a GitHub; questo sito non la vede.</li>
+    <li data-i18n="privacy.site_li2" data-i18n-html><strong>Google Fonts</strong> — i caratteri della pagina sono caricati dai server di Google, come sulla maggior parte dei siti che usano Google Fonts. Il tuo browser richiede quei file direttamente a Google.</li>
+  </ul>
+  <p data-i18n="privacy.site_p2">Nessuna delle due è qualcosa che questo sito raccoglie o a cui ha accesso — sono richieste che il tuo browser fa direttamente a terzi, normali per una pagina che mostra l’ultima release e usa web font.</p>
+
+  <h2 data-i18n="privacy.h2_cookies">Cookie</h2>
+  <p><span data-i18n="privacy.cookies_p1">Né il programma né questo sito usano cookie. Vedi la</span> <a href="cookie-policy.html" data-i18n="privacy.cookies_link">Cookie Policy</a> <span data-i18n="privacy.cookies_p1_end">per la risposta completa, breve.</span></p>
+
+  <h2 data-i18n="privacy.h2_changes">Modifiche a questa pagina</h2>
+  <p data-i18n="privacy.changes_p1">Questa pagina resta allineata a quello che il programma fa davvero, non a quello che potrebbe fare in futuro — se SPVault aggiungesse una funzione opzionale che cambia qualcosa di quanto sopra, questa pagina verrebbe aggiornata nello stesso cambiamento, non dopo.</p>
+
+  <h2 data-i18n="privacy.h2_controller">Titolare del trattamento</h2>
+  <p data-i18n="privacy.controller_p1" data-i18n-html>SPVault non fa parte del catalogo commerciale MTSolutions — è un progetto personale con licenza MIT — ma è pubblicato dalla stessa persona/entità dietro MTSolutions: <strong>San Marino Games S.r.l.</strong>, Via Fondo Ausa 68, 47891 Dogana, Repubblica di San Marino (RSM), C.O.E. SM18083.</p>
+
+  <h2 data-i18n="privacy.h2_questions">Domande</h2>
+  <p><span data-i18n="privacy.questions_p1">Apri una segnalazione su</span> <a href="https://github.com/TarducciM/SPVault/issues" target="_blank" rel="noopener">GitHub</a><span data-i18n="privacy.questions_p1_end">, oppure scrivi a</span> <a href="mailto:info@mtsolutions.studio">info@mtsolutions.studio</a>.</p>
+</main>
+</div>
+
+<div class="legal-wrap">
+<footer class="site">
+  <p style="font-size:13px; color:var(--text-faint); margin:0;">SPVault — <span data-i18n="footer.license">Con licenza MIT.</span> <a href="index.html" data-i18n="footer.home" style="color:var(--text-dim);">Home</a> · <a href="terms.html" data-i18n="footer.terms" style="color:var(--text-dim);">Termini</a> · <a href="cookie-policy.html" data-i18n="footer.cookie" style="color:var(--text-dim);">Cookie Policy</a></p>
+</footer>
+</div>
+
+<script src="i18n.js?v=2026-09-22"></script>
+</body>
+</html>
