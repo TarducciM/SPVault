@@ -25,14 +25,21 @@
     <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#iconBg)"/>
     <rect x="64" y="64" width="896" height="470" fill="url(#gloss)" clip-path="url(#clip)"/>
 
-    <!-- vault door on its hinges -->
-    <circle cx="486" cy="512" r="203" fill="none" stroke="#ffffff" stroke-width="56"/>
-    <path d="M258 378 V446 M258 578 V646" fill="none" stroke="#ffffff" stroke-width="52" stroke-linecap="round"/>
+    <g transform="translate(512 546) scale(0.86) translate(-512 -512)">
+      <!-- cloud: outline of three circles on a flat base, open at the bottom -->
+      <mask id="cloud" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+        <g fill="#fff"><circle cx="354" cy="402" r="118"/><circle cx="502" cy="302" r="170"/><circle cx="650" cy="382" r="138"/><rect x="354" y="402" width="296" height="118"/></g>
+        <g fill="#000"><circle cx="354" cy="402" r="72"/><circle cx="502" cy="302" r="124"/><circle cx="650" cy="382" r="92"/><rect x="354" y="302" width="296" height="172"/></g>
+        <rect x="440" y="434" width="144" height="126" fill="#000"/>
+      </mask>
+      <rect width="1024" height="1024" fill="#ffffff" mask="url(#cloud)"/>
+      <circle cx="440" cy="497" r="23" fill="#ffffff"/><circle cx="584" cy="497" r="23" fill="#ffffff"/>
 
-    <!-- arrow: files copied down into the vault -->
-    <path d="M486 412 V602 M412 528 L486 602 L560 528" fill="none" stroke="#ffffff" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- arrow: files coming down from the cloud -->
+      <path d="M512 400 V670 M440 598 L512 670 L584 598" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FBBF24" stroke-width="50"/>
 
-    <!-- handle -->
-    <circle cx="751" cy="512" r="46" fill="#FBBF24"/>
+      <!-- tray: safe on your PC -->
+      <path d="M300 676 V742 Q300 790 348 790 H676 Q724 790 724 742 V676" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#ffffff" stroke-width="46"/>
+    </g>
   </svg>
 </svg>

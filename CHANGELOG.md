@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-22 — Nuova icona
+
+- **Icona ridisegnata**: una nuvola bianca da cui scende una freccia dorata dentro un vassoio (i file
+  dal cloud al sicuro sul PC), sugli stessi colori verde smeraldo. Il simbolo è più piccolo e centrato
+  nel quadrato, come nelle altre app della stessa famiglia, e ha tratti più grossi nelle dimensioni da
+  16 a 48 px per restare nitido nella barra delle applicazioni.
+- **Anteprima per GitHub** (`assets/social-preview.png`) rifatta con la nuova icona.
+
 ## 2026-09-22 — Prima versione pubblica (0.1.0)
 
 - **Backup file per file di SharePoint e OneDrive for Business dal browser**: basta poter aprire i

@@ -1,17 +1,16 @@
 r"""Icona di SPVault e immagine per la pagina GitHub (social preview), dal disegno descritto qui sotto.
 
 Scrive in assets\:
-  app-icon.svg        icona 1024x1024: quadrato arrotondato con sfumatura e, in bianco, la porta
-                      tonda di una cassaforte (cerniere a sinistra, pomello dorato a destra) con
-                      dentro una freccia verso il basso: i file copiati al sicuro sul PC
+  app-icon.svg        icona 1024x1024: quadrato arrotondato con sfumatura e, in bianco, una nuvola
+                      da cui scende una freccia dorata dentro un vassoio: i file dal cloud al
+                      sicuro sul PC
   social-preview.svg  immagine 1280x640 per GitHub (Settings > General > Social preview)
   social-preview.png  la stessa in PNG, da caricare su GitHub
   spvault.ico         icona dell'exe, dell'installer e della finestra: 16, 20, 24, 32, 40, 48, 64, 128, 256 px
   spvault.png         256x256, icona della finestra (tk iconphoto)
 
-Le dimensioni da 16 a 48 px hanno un disegno ritoccato (tratti un po' più grossi e allineati ai
-pixel; sotto i 24 px niente cerniere e freccia con la punta piena) per restare nitide nella barra
-del titolo, nella barra delle applicazioni e sul desktop.
+Le dimensioni da 16 a 48 px hanno tratti più grossi e il simbolo un po' più grande (tabella SMALL)
+per restare nitide nella barra del titolo, nella barra delle applicazioni e sul desktop.
 
 Gli SVG vengono disegnati in PNG da Chrome o Edge tramite Playwright (già una dipendenza dell'app);
 Pillow serve per il file .ico e per l'anteprima:  python -m pip install -r requirements-dev.txt
@@ -32,57 +31,46 @@ ICO_SIZES = (16, 20, 24, 32, 40, 48, 64, 128, 256)
 TILE = ("#22B98A", "#064A3A")    # sfumatura del quadrato, dall'angolo in alto a sinistra a quello in basso a destra
 BANNER = ("#0F2E27", "#061712")  # sfondo della social preview: stessa tinta, molto scura
 WHITE = "#ffffff"
-GOLD = "#FBBF24"                 # pomello della porta, unico colore di contrasto
+GOLD = "#FBBF24"                 # freccia, unico colore di contrasto
 
 # Disegno in unità della viewBox 1024x1024 (quadrato x=y=64, lato 896, raggio 200 come le altre app
-# della stessa famiglia).
-#   ring   porta: centro, raggio e spessore del cerchio
-#   arrow  freccia: x, inizio e punta (y), mezza larghezza e altezza della punta, spessore;
-#          solid = punta piena (per le dimensioni più piccole)
-#   hinges cerniere: x, centro (y) di ciascuna, mezza lunghezza, spessore; None = senza cerniere
-#   knob   pomello dorato: centro e raggio
+# della stessa famiglia). Simbolo: una nuvola (contorno bianco a spessore costante, aperta sul fondo)
+# da cui scende una freccia dorata dentro un vassoio bianco: i file dal cloud al sicuro sul PC.
+#   lobes  nuvola: tre cerchi (x, y, raggio); la base piatta va dal primo all'ultimo
+#   base   y della base della nuvola; gap = apertura sul fondo (x1, x2) da cui esce la freccia
+#   arrow  freccia: x, inizio e punta (y), mezza larghezza della punta
+#   tray   vassoio: x sinistra/destra, y dei bordi alti, y del fondo, raggio degli angoli
+#   stroke spessore dei tratti; weight lo moltiplica (più grosso nelle dimensioni piccole)
+#   zoom   scala del simbolo attorno al centro (0.86: occupa circa due terzi del quadrato, come le
+#          altre app); nelle dimensioni piccole SMALL lo moltiplica per ingrandirlo un po'
+#   shift  spostamento verso il basso, per centrarlo otticamente (la nuvola pesa in alto)
 MASTER = {
     "margin": 64, "radius": 200,
-    "ring": (486, 512, 203, 56),
-    "arrow": (486, 412, 602, 74, 74, 56), "solid": False,
-    "hinges": (258, (412, 612), 34, 52),
-    "knob": (751, 512, 46),
+    "lobes": ((354, 402, 118), (502, 302, 170), (650, 382, 138)), "base": 520, "gap": (440, 584),
+    "arrow": (512, 400, 670, 72),
+    "tray": (300, 724, 676, 790, 48),
+    "stroke": 46, "weight": 1.0, "zoom": 0.86, "shift": 34,
 }
 
-
-def pixels(size: int, **p) -> dict:
-    """Disegno scritto in pixel della dimensione finale -> unità della viewBox."""
-    k = 1024 / size
-
-    def scale(v):
-        if isinstance(v, tuple):
-            return tuple(scale(x) for x in v)
-        return v * k if isinstance(v, (int, float)) and not isinstance(v, bool) else v
-    return {name: scale(v) for name, v in p.items()}
-
-
-# Dimensioni piccole ritoccate a mano, in pixel: bordi del quadrato, del cerchio e della freccia su pixel interi.
+# Dimensioni piccole: bordo del quadrato su pixel interi, tratti più grossi e simbolo un po' più grande.
 SMALL = {
-    48: pixels(48, margin=3, radius=9.4, ring=(22.5, 23.5, 10, 3), arrow=(22.5, 18.5, 28.5, 4.5, 4.5, 3),
-               solid=False, hinges=(10.5, (19, 28), 1.5, 3), knob=(35.5, 23.5, 2.5)),
-    40: pixels(40, margin=2, radius=7.8, ring=(19, 20, 9, 2), arrow=(19, 15, 24.5, 4, 4, 2), solid=False,
-               hinges=(8.5, (15.5, 24.5), 1.25, 2.5), knob=(29.75, 20, 2.25)),
-    32: pixels(32, margin=2, radius=6.25, ring=(15, 16, 8, 2), arrow=(15, 11.5, 20, 3.5, 3.5, 2), solid=False,
-               hinges=(6.5, (12.5, 19.5), 1, 2.5), knob=(25.5, 16, 2)),
-    24: pixels(24, margin=1, radius=4.75, ring=(11, 12, 6, 2), arrow=(11, 9, 14.5, 2.5, 2.5, 2), solid=False,
-               hinges=(4, (8.5, 15.5), 0.5, 1.5), knob=(19.5, 12, 1.75)),
-    20: pixels(20, margin=1, radius=4, ring=(9, 10, 5.25, 1.5), arrow=(9, 6.5, 13.5, 3, 3.5, 2), solid=True,
-               hinges=None, knob=(15.75, 10, 1.5)),
-    16: pixels(16, margin=1, radius=3.25, ring=(7, 8, 4.25, 1.5), arrow=(7, 4.75, 11, 2.5, 3, 2), solid=True,
-               hinges=None, knob=(13, 8, 1.25)),
+    48: dict(margin=3, weight=1.1, zoom=1.02),
+    40: dict(margin=2, weight=1.15, zoom=1.03),
+    32: dict(margin=2, weight=1.25, zoom=1.04),
+    24: dict(margin=1, weight=1.4, zoom=1.06),
+    20: dict(margin=1, weight=1.55, zoom=1.08),
+    16: dict(margin=1, weight=1.7, zoom=1.1),
 }
 
 
 def layout(size: int) -> dict:
-    if size in SMALL:
-        return SMALL[size]
-    margin = round(MASTER["margin"] * size / 1024)  # bordo del quadrato su un pixel intero
-    return dict(MASTER, margin=margin * 1024 / size)
+    tuned = SMALL.get(size, {})
+    margin = tuned.get("margin", round(MASTER["margin"] * size / 1024))  # bordo su un pixel intero
+    margin_units = margin * 1024 / size
+    radius = MASTER["radius"] * (1024 - 2 * margin_units) / (1024 - 2 * MASTER["margin"])
+    zoom = MASTER["zoom"] * tuned.get("zoom", 1)
+    return dict(MASTER, **{k: v for k, v in tuned.items() if k not in ("margin", "zoom")},
+                margin=margin_units, radius=radius, zoom=zoom)
 
 
 def num(v: float) -> str:
@@ -90,36 +78,51 @@ def num(v: float) -> str:
 
 
 def glyph(p: dict, bg: str, gloss: str, clip: str, indent: str) -> list[str]:
-    """Elementi dell'icona (quadrato, riflesso, porta, freccia, pomello), senza <svg> e <defs>."""
+    """Elementi dell'icona (quadrato, riflesso, nuvola, freccia, vassoio), senza <svg> e <defs>."""
     m, r = num(p["margin"]), num(p["radius"])
     side = num(1024 - 2 * p["margin"])
-    cx, cy, rr, sw = p["ring"]
-    ax, ay0, ay1, aw, ah, asw = p["arrow"]
-    kx, ky, kr = p["knob"]
-    stroke = f'fill="none" stroke="{WHITE}"'
+    t = p["stroke"] * p["weight"]
+    (x1, _, _), _, (x2, _, _) = p["lobes"]
+    base, (g1, g2) = p["base"], p["gap"]
+    ax, ay0, ay1, head = p["arrow"]
+    tl, tr, ttop, tbot, trad = p["tray"]
+    z = p["zoom"]
+    outer = "".join(f'<circle cx="{num(x)}" cy="{num(y)}" r="{num(rr)}"/>' for x, y, rr in p["lobes"])
+    top_left, top = p["lobes"][0][1], p["lobes"][1][1]  # base piena: dal lobo sinistro in giù
+    outer += (f'<rect x="{num(x1)}" y="{num(top_left)}" width="{num(x2 - x1)}" '
+              f'height="{num(base - top_left)}"/>')
+    inner = "".join(f'<circle cx="{num(x)}" cy="{num(y)}" r="{num(rr - t)}"/>' for x, y, rr in p["lobes"])
+    inner += (f'<rect x="{num(x1)}" y="{num(top)}" width="{num(x2 - x1)}" '
+              f'height="{num(base - t - top)}"/>')
+    round_caps = "".join(f'<circle cx="{num(x)}" cy="{num(base - t / 2)}" r="{num(t / 2)}" fill="{WHITE}"/>'
+                         for x in (g1, g2))
+    line = 'fill="none" stroke-linecap="round" stroke-linejoin="round"'
     lines = [
         "<!-- rounded square -->",
         f'<rect x="{m}" y="{m}" width="{side}" height="{side}" rx="{r}" fill="url(#{bg})"/>',
         f'<rect x="{m}" y="{m}" width="{side}" height="470" fill="url(#{gloss})" clip-path="url(#{clip})"/>',
         "",
-        "<!-- vault door on its hinges -->",
-        f'<circle cx="{num(cx)}" cy="{num(cy)}" r="{num(rr)}" {stroke} stroke-width="{num(sw)}"/>',
+        f'<g transform="translate(512 {num(512 + p["shift"])}) scale({num(z)}) translate(-512 -512)">',
+        "  <!-- cloud: outline of three circles on a flat base, open at the bottom -->",
+        '  <mask id="cloud" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">',
+        f'    <g fill="#fff">{outer}</g>',
+        f'    <g fill="#000">{inner}</g>',
+        f'    <rect x="{num(g1)}" y="{num(base - t - 40)}" width="{num(g2 - g1)}" height="{num(t + 80)}" fill="#000"/>',
+        "  </mask>",
+        f'  <rect width="1024" height="1024" fill="{WHITE}" mask="url(#cloud)"/>',
+        f"  {round_caps}",
+        "",
+        "  <!-- arrow: files coming down from the cloud -->",
+        f'  <path d="M{num(ax)} {num(ay0)} V{num(ay1)} M{num(ax - head)} {num(ay1 - head)} L{num(ax)} {num(ay1)} '
+        f'L{num(ax + head)} {num(ay1 - head)}" {line} stroke="{GOLD}" stroke-width="{num(t * 50 / 46)}"/>',
+        "",
+        "  <!-- tray: safe on your PC -->",
+        f'  <path d="M{num(tl)} {num(ttop)} V{num(tbot - trad)} Q{num(tl)} {num(tbot)} {num(tl + trad)} {num(tbot)} '
+        f'H{num(tr - trad)} Q{num(tr)} {num(tbot)} {num(tr)} {num(tbot - trad)} V{num(ttop)}" {line} '
+        f'stroke="{WHITE}" stroke-width="{num(t)}"/>',
+        "</g>",
     ]
-    if p["hinges"]:
-        hx, ys, half, hsw = p["hinges"]
-        d = " ".join(f"M{num(hx)} {num(y - half)} V{num(y + half)}" for y in ys)
-        lines.append(f'<path d="{d}" {stroke} stroke-width="{num(hsw)}" stroke-linecap="round"/>')
-    lines += ["", "<!-- arrow: files copied down into the vault -->"]
-    if p["solid"]:
-        lines += [f'<path d="M{num(ax)} {num(ay0)} V{num(ay1 - ah)}" {stroke} stroke-width="{num(asw)}"/>',
-                  f'<path d="M{num(ax - aw)} {num(ay1 - ah)} H{num(ax + aw)} L{num(ax)} {num(ay1)} Z" '
-                  f'fill="{WHITE}"/>']
-    else:
-        lines.append(f'<path d="M{num(ax)} {num(ay0)} V{num(ay1)} M{num(ax - aw)} {num(ay1 - ah)} '
-                     f'L{num(ax)} {num(ay1)} L{num(ax + aw)} {num(ay1 - ah)}" {stroke} '
-                     f'stroke-width="{num(asw)}" stroke-linecap="round" stroke-linejoin="round"/>')
-    lines += ["", "<!-- handle -->", f'<circle cx="{num(kx)}" cy="{num(ky)}" r="{num(kr)}" fill="{GOLD}"/>']
-    return [indent + line if line else "" for line in lines]
+    return [indent + ln if ln else "" for ln in lines]
 
 
 def defs(p: dict, bg: str, colors: tuple[str, str], indent: str, gloss_clip=True) -> list[str]:
