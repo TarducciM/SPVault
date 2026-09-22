@@ -69,7 +69,7 @@ from xml.sax.saxutils import escape
 
 import requests
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 APP_DIR =Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "SPVault"
 PROFILE_DIR = APP_DIR / "browser_profile"

@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026-09-22 — Nuova icona
+## 2026-09-22 — Nuova icona (0.1.1)
 
 - **Icona ridisegnata**: una nuvola bianca da cui scende una freccia dorata dentro un vassoio (i file
   dal cloud al sicuro sul PC), sugli stessi colori verde smeraldo. Il simbolo è più piccolo e centrato
