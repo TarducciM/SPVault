@@ -1,0 +1,172 @@
+<!--
+  Per-user MSI installer (no administrator rights needed): installs to
+  %LOCALAPPDATA%\Programs\SPVault. Options: Start menu/desktop shortcuts,
+  start at Windows sign-in, app language. Build: build_msi.ps1
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <Package Name="SPVault" Manufacturer="Michele Tarducci" Version="$(var.Version)"
+           UpgradeCode="{E8EEC9A9-BD40-4F16-BF8D-E8FCBB3F7C0E}" Scope="perUser" Language="1033">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of SPVault is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- icon of the shortcuts and of the entry in "Installed apps" (the Id keeps the .ico
+         extension: Windows uses it to read the copy it caches for the shortcuts) -->
+    <Icon Id="AppIcon.ico" SourceFile="$(var.IconPath)" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
+
+    <!-- option defaults (the "Options" dialog can change them) -->
+    <Property Id="STARTMENUSHORTCUT" Value="1" />
+    <Property Id="STARTUP" Value="1" />
+    <Property Id="APPLANGUAGE" Value="auto" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch SPVault" />
+
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="ProgramsDir" Name="Programs">
+        <Directory Id="INSTALLFOLDER" Name="SPVault" />
+      </Directory>
+    </StandardDirectory>
+
+    <!-- per-user install: every component is keyed by an HKCU value -->
+    <Component Id="App" Directory="INSTALLFOLDER" Guid="{A2337381-AB19-435A-9F48-CCF9455010C4}">
+      <File Id="AppExe" Source="$(var.ExePath)" Name="SPVault.exe" KeyPath="no" />
+      <RegistryValue Root="HKCU" Key="Software\SPVault" Name="InstallDir" Type="string"
+                     Value="[INSTALLFOLDER]" KeyPath="yes" />
+      <!-- language chosen in the installer: the app applies it at startup -->
+      <RegistryValue Root="HKCU" Key="Software\SPVault" Name="Language" Type="string"
+                     Value="[APPLANGUAGE]" />
+      <RemoveFolder Id="RemoveInstallFolder" Directory="INSTALLFOLDER" On="uninstall" />
+      <RemoveFolder Id="RemoveProgramsDir" Directory="ProgramsDir" On="uninstall" />
+    </Component>
+
+    <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder" Condition="STARTMENUSHORTCUT = 1"
+               Guid="{30946AC1-22A2-4C7F-9AF1-F71732485FFB}">
+      <Shortcut Id="StartMenuLink" Name="SPVault" Target="[INSTALLFOLDER]SPVault.exe" Icon="AppIcon.ico"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKCU" Key="Software\SPVault" Name="StartMenuShortcut" Type="integer"
+                     Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="DesktopShortcut" Directory="DesktopFolder" Condition="DESKTOPSHORTCUT = 1"
+               Guid="{2734291A-435A-427E-9C16-1BDA483D34B3}">
+      <Shortcut Id="DesktopLink" Name="SPVault" Target="[INSTALLFOLDER]SPVault.exe" Icon="AppIcon.ico"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKCU" Key="Software\SPVault" Name="DesktopShortcut" Type="integer"
+                     Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="StartupShortcut" Directory="StartupFolder" Condition="STARTUP = 1"
+               Guid="{95C7DA0B-FD27-4C10-A9A1-85077DF1AEF3}">
+      <Shortcut Id="StartupLink" Name="SPVault" Target="[INSTALLFOLDER]SPVault.exe" Icon="AppIcon.ico"
+                Arguments="--minimized" WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKCU" Key="Software\SPVault" Name="StartupShortcut" Type="integer"
+                     Value="1" KeyPath="yes" />
+    </Component>
+
+    <Feature Id="Main" Title="SPVault" Level="1">
+      <ComponentRef Id="App" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+      <ComponentRef Id="StartupShortcut" />
+    </Feature>
+
+    <!-- launch the app at the end of the setup (checkbox on the last page) -->
+    <CustomAction Id="LaunchApp" Directory="INSTALLFOLDER" ExeCommand="&quot;[INSTALLFOLDER]SPVault.exe&quot;"
+                  Return="asyncNoWait" Impersonate="yes" />
+
+    <!-- uninstall: also removes the scheduled backup created by the app -->
+    <SetProperty Id="RemoveScheduledTask" Before="RemoveScheduledTask" Sequence="execute"
+                 Value="&quot;[SystemFolder]schtasks.exe&quot; /Delete /TN &quot;SPVault&quot; /F" />
+    <CustomAction Id="RemoveScheduledTask" BinaryRef="Wix4UtilCA_X86" DllEntry="WixQuietExec"
+                  Execute="deferred" Return="ignore" Impersonate="yes" />
+    <InstallExecuteSequence>
+      <Custom Action="RemoveScheduledTask" Before="RemoveFiles"
+              Condition="REMOVE = &quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
+    </InstallExecuteSequence>
+
+    <UIRef Id="SPB_UI" />
+  </Package>
+
+  <Fragment>
+    <UI Id="SPB_UI">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+
+      <ComboBox Property="APPLANGUAGE">
+        <ListItem Value="auto" Text="Automatic (Windows language)" />
+        <ListItem Value="it" Text="Italiano" />
+        <ListItem Value="en" Text="English" />
+      </ComboBox>
+
+      <Dialog Id="OptionsDlg" Width="370" Height="270" Title="!(loc.WelcomeDlg_Title)">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no"
+                 Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="280" Height="15" Transparent="yes" NoPrefix="yes"
+                 Text="{\WixUI_Font_Title}Options" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes"
+                 NoPrefix="yes" Text="Shortcuts, automatic start and language of SPVault." />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+
+        <Control Id="StartMenu" Type="CheckBox" X="20" Y="58" Width="330" Height="17"
+                 Property="STARTMENUSHORTCUT" CheckBoxValue="1" Text="Create a Start menu shortcut" />
+        <Control Id="Desktop" Type="CheckBox" X="20" Y="78" Width="330" Height="17"
+                 Property="DESKTOPSHORTCUT" CheckBoxValue="1" Text="Create a desktop shortcut" />
+        <Control Id="Startup" Type="CheckBox" X="20" Y="98" Width="330" Height="17"
+                 Property="STARTUP" CheckBoxValue="1"
+                 Text="Start SPVault when I sign in to Windows (minimized)" />
+
+        <Control Id="LanguageLabel" Type="Text" X="20" Y="126" Width="110" Height="15"
+                 Text="App language:" />
+        <Control Id="Language" Type="ComboBox" X="130" Y="123" Width="200" Height="16"
+                 Property="APPLANGUAGE" ComboList="yes" />
+
+        <Control Id="Note" Type="Text" X="20" Y="152" Width="330" Height="70" NoPrefix="yes"
+                 Text="The daily automatic backup is set up in the app (Schedule button). It stays active across shutdowns and restarts: if the PC is off at the scheduled time, the backup starts as soon as you turn it back on." />
+
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes"
+                 Text="!(loc.WixUINext)" />
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes"
+                 Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+      </Dialog>
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="OptionsDlg" Condition="NOT Installed" />
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"
+               Condition="Installed AND PATCH" />
+      <Publish Dialog="OptionsDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" />
+      <Publish Dialog="OptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="OptionsDlg" Order="1"
+               Condition="NOT Installed" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"
+               Condition="Installed AND NOT PATCH" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2"
+               Condition="Installed AND PATCH" />
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApp"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999" />
+    </UI>
+    <UIRef Id="WixUI_Common" />
+  </Fragment>
+</Wix>

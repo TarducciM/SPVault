@@ -1,0 +1,38 @@
+<svg viewBox="0 0 1280 640" xmlns="http://www.w3.org/2000/svg">
+  <!-- SPVault: written by assets/make_icon.py (change the layout there and run it again) -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0F2E27"/>
+      <stop offset="1" stop-color="#061712"/>
+    </linearGradient>
+    <linearGradient id="iconBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22B98A"/>
+      <stop offset="1" stop-color="#064A3A"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="clip">
+      <rect x="64" y="64" width="896" height="896" rx="200"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#bg)"/>
+
+  <svg x="450" y="130" width="380" height="380" viewBox="0 0 1024 1024">
+    <!-- rounded square -->
+    <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#iconBg)"/>
+    <rect x="64" y="64" width="896" height="470" fill="url(#gloss)" clip-path="url(#clip)"/>
+
+    <!-- vault door on its hinges -->
+    <circle cx="486" cy="512" r="203" fill="none" stroke="#ffffff" stroke-width="56"/>
+    <path d="M258 378 V446 M258 578 V646" fill="none" stroke="#ffffff" stroke-width="52" stroke-linecap="round"/>
+
+    <!-- arrow: files copied down into the vault -->
+    <path d="M486 412 V602 M412 528 L486 602 L560 528" fill="none" stroke="#ffffff" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- handle -->
+    <circle cx="751" cy="512" r="46" fill="#FBBF24"/>
+  </svg>
+</svg>

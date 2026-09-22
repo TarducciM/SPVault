@@ -1,0 +1,109 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - run: python -m pip install -r requirements-dev.txt
+
+      # Il tag deve coincidere con __version__ in spvault.py (titolo della finestra, MSI).
+      - shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          code=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' spvault.py)
+          if [ "$version" != "$code" ]; then
+            echo "::error::Il tag $GITHUB_REF_NAME non coincide con __version__ = $code"
+            exit 1
+          fi
+
+      - run: python -m ruff check .
+      - run: python -m pytest
+
+      - run: dotnet tool install --global wix --version 5.0.2
+
+      - name: Exe portabile + autotest
+        run: ./build.ps1
+        shell: pwsh
+
+      - name: Installer MSI
+        run: ./build_msi.ps1
+        shell: pwsh
+
+      # Bozza: niente va online finché la release non viene rivista e pubblicata a mano.
+      - shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          portable="SPVault_${version}_x64-portable.exe"
+          msi="dist/SPVault_${version}_x64_en-US.msi"
+          cp dist/SPVault.exe "$portable"
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$portable" "$msi" --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$portable" "$msi" --repo "$GITHUB_REPOSITORY" \
+              --draft --title "SPVault $GITHUB_REF_NAME" --notes "Build in corso..."
+          fi
+
+  notes:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/releases/generate-notes" \
+            -f tag_name="${{ github.ref_name }}" --jq .body > notes.md
+
+          version="${GITHUB_REF_NAME#v}"
+          base="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
+
+          cat > downloads.md <<EOF
+          ### Downloads
+
+          | File | Notes |
+          | --- | --- |
+          | [SPVault_${version}_x64_en-US.msi]($base/SPVault_${version}_x64_en-US.msi) | Installer (MSI, per user: no admin rights needed) |
+          | [SPVault_${version}_x64-portable.exe]($base/SPVault_${version}_x64-portable.exe) | Portable, no install |
+
+          Requires Google Chrome or Microsoft Edge (used for the SharePoint sign-in).
+
+          **Recommended: use the installer** (.msi) — it installs for your user only (no admin rights), lets you choose Start Menu and desktop shortcuts, "launch at Windows startup" and the app language, and adds a clean entry in "Apps & features" for uninstalling (which also removes the scheduled backup). The portable .exe works fine for a quick try, but if you later move or delete it, the scheduled backup silently stops working, since it points at wherever the file was when you set it up.
+
+          **Consigliato: usa l'installer** (.msi) — si installa solo per il tuo utente (senza permessi da amministratore), permette di scegliere i collegamenti nel menu Start e sul desktop, l'avvio automatico con Windows e la lingua dell'app, e aggiunge una voce in "App e funzionalità" per disinstallarlo in modo pulito (togliendo anche il backup pianificato). La versione portable va benissimo per una prova veloce, ma se in seguito la sposti o la elimini, il backup pianificato smette di funzionare silenziosamente, perché punta a dove si trovava il file quando l'hai impostato.
+          EOF
+
+          cat downloads.md notes.md > full-notes.md
+          gh release edit "${{ github.ref_name }}" --repo "${{ github.repository }}" --notes-file full-notes.md
+
+  cleanup-on-failure:
+    needs: publish
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # La build è fallita: la bozza (se creata) avrebbe asset parziali. Meglio toglierla;
+      # il tag resta, basta rilanciare il run (o workflow_dispatch) dopo la correzione.
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release delete "${{ github.ref_name }}" --repo "${{ github.repository }}" --yes || true
