@@ -326,9 +326,18 @@ L'**installer** mette il programma in `%LOCALAPPDATA%\Programs\SPVault` e fa sce
 - la **lingua dell'app**: automatica, italiano o inglese (si può cambiare anche dopo, dalla
   finestra).
 
-Si disinstalla da "App e funzionalità", e la disinstallazione toglie anche il backup pianificato.
-I dati dell'app (impostazioni, sessione, stato) restano, così una reinstallazione riparte da dove
-eri; per eliminarli cancella `%LOCALAPPDATA%\SPVault`.
+Riaprendo l'installer quando SPVault c'è già compare un menu di manutenzione:
+
+- **Ripara**: rimette i file mancanti o danneggiati;
+- **Modifica opzioni**: cambia collegamenti e avvio automatico (le caselle partono da come sono
+  adesso); la lingua si cambia nella finestra dell'app;
+- **Reinstalla tutto**: riscrive ogni file del programma;
+- **Disinstalla**.
+
+Le stesse voci si trovano in "App installate" di Windows (Modifica e Disinstalla). Aggiornando a una
+versione nuova le opzioni scelte prima vengono mantenute. La disinstallazione toglie anche il backup
+pianificato; i dati dell'app (impostazioni, sessione, stato) restano, così una reinstallazione
+riparte da dove eri; per eliminarli cancella `%LOCALAPPDATA%\SPVault`.
 
 La **versione portabile** va bene per una prova. Se però pianifichi il backup e poi sposti o cancelli
 il file, l'attività pianificata smette di funzionare, perché punta a dove si trovava l'exe.

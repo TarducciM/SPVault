@@ -71,7 +71,7 @@ from xml.sax.saxutils import escape
 
 import requests
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 APP_DIR =Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "SPVault"
 PROFILE_DIR = APP_DIR / "browser_profile"
@@ -351,6 +351,8 @@ EN: dict[str, str] = {
     "non riuscito": "failed",
     "Ultimo backup automatico ({when}):": "Last automatic backup ({when}):",
     "OK (riscritto dalla sincronizzazione)": "OK (rewritten by the sync)",
+    " (di cui {count} riscritti dalla sincronizzazione dopo la copia)":
+        " ({count} of them rewritten by the sync after the copy)",
     ", {count} riscritti dalla sincronizzazione": ", {count} rewritten by the sync",
     "Backup pianificato ogni giorno alle {time}. Se a quell'ora il PC è spento, parte appena lo riaccendi.":
         "Backup scheduled every day at {time}. If the PC is off at that time, it starts as soon as "
@@ -1362,8 +1364,12 @@ class Backup:
                              "con il tuo account e non si possono copiare (elenco nel log)",
                              count=n, size=fmt_size(max(size, 0)), folders=len(self.hidden))
         if self.complete:
+            # i file riscritti dalla sincronizzazione dopo la copia sono lo stesso documento, ma non
+            # più identici byte per byte: va detto invece di dichiararli uguali
+            resynced = (tr(" (di cui {count} riscritti dalla sincronizzazione dopo la copia)",
+                           count=len(self.resynced)) if self.resynced else "")
             return tr("VERIFICA OK: tutti i {count} file visibili ({size}) sono in {folder}, identici a SharePoint",
-                      count=len(files), size=total, folder=CURRENT_DIR) + note
+                      count=len(files), size=total, folder=CURRENT_DIR) + resynced + note
         return (tr("VERIFICA NON SUPERATA: {count} file mancanti", count=len(missing))
                 + (tr(", {count} cartelle non verificabili", count=len(unchecked)) if unchecked else "")
                 + tr(" (elenco nel log e in {manifest})", manifest=MANIFEST) + note)

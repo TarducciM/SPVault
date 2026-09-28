@@ -323,7 +323,16 @@ The **installer** puts the program in `%LOCALAPPDATA%\Programs\SPVault` and lets
   folders and sizes;
 - the **app language**: automatic, Italian or English (you can change it later in the window).
 
-Uninstall it from "Apps & features"; uninstalling also removes the scheduled backup. The app's data
+Running the installer again when SPVault is already there opens a maintenance menu:
+
+- **Repair**: puts back missing or damaged files;
+- **Change options**: shortcuts and start at sign-in (the boxes start from how things are now); the
+  language is changed in the app's own window;
+- **Reinstall everything**: rewrites every program file;
+- **Uninstall**.
+
+The same entries are in Windows "Installed apps" (Modify and Uninstall). Upgrading to a new version
+keeps the options you chose before. Uninstalling also removes the scheduled backup; the app's data
 (settings, session, state) is kept, so a reinstall picks up where you left off; to remove it, delete
 `%LOCALAPPDATA%\SPVault`.
 

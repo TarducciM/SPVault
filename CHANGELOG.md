@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-28 — Manutenzione nell'installer (0.1.2)
+
+- **Menu di manutenzione**: riaprendo l'MSI quando SPVault c'è già si sceglie tra *Ripara*,
+  *Modifica opzioni*, *Reinstalla tutto* e *Disinstalla*; le stesse voci sono in "App installate"
+  di Windows. In *Modifica opzioni* le caselle partono dai collegamenti che ci sono davvero e le
+  modifiche vengono applicate subito.
+- **Perché prima non funzionava**: i collegamenti erano componenti a condizione, che Windows
+  Installer non rivaluta su un prodotto già installato; reinstallando la stessa versione il prodotto
+  si sdoppiava, e con due copie registrate i collegamenti non si toglievano più (il conteggio dei
+  riferimenti non arrivava a zero); le caselle leggevano lo stato richiesto invece di quello
+  installato; senza `WixUI_InstallMode` la pagina di riepilogo restava vuota, senza pulsante per
+  confermare.
+- **Le opzioni sopravvivono agli aggiornamenti**: collegamenti e lingua scelti prima vengono
+  mantenuti, a meno che l'installer non riceva altre opzioni sulla riga di comando.
+- **Disinstallazione più pulita**: viene via anche la chiave di registro `HKCU\Software\SPVault`.
+- Nuovi test (`tests/test_installer.py`) sulle regole dell'installer, e prove dal vivo di
+  installazione, modifica, riparazione, reinstallazione completa, aggiornamento e disinstallazione,
+  dalla finestra e in silenzio.
+
 ## 2026-09-22 — Sito del progetto (`site/`)
 
 - **Sito statico in `site/`**: home (hero, pannello con il log di verifica, 6 funzioni, download che

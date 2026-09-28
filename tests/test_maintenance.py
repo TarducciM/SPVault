@@ -111,3 +111,10 @@ def test_a_deleted_local_file_is_still_downloaded(bk: Harness):
     (bk.current / "2. Projects" / "note.txt").unlink()
     bk.run()
     assert bk.server.downloads == ["f3"]
+
+
+def test_the_verdict_says_how_many_files_the_sync_rewrote(bk: Harness):
+    bk.run()
+    (bk.current / "2. Projects" / "note.txt").write_bytes(b"riscritto dalla sincronizzazione")
+    summary = bk.run()
+    assert "VERIFICA OK" in summary and "di cui 1 riscritti dalla sincronizzazione dopo la copia" in summary
