@@ -20,6 +20,19 @@
 - Non ancora online: manca il deploy (DNS + hosting) all'indirizzo proposto
   `https://spvault.mtsolutions.studio/`.
 
+## 2026-09-28 — Meno lavoro inutile, esito dei backup automatici sotto gli occhi
+
+- **File riscritti dalla sincronizzazione**: dopo l'upload di un file Office, SharePoint ne riscrive i
+  metadati interni e la sincronizzazione riporta indietro la copia modificata. Prima SPVault la vedeva
+  diversa e riscaricava quei file a ogni backup, all'infinito. Ora, se su SharePoint il file non è
+  cambiato, riconosce che la differenza è locale: non riscarica niente e lo segna nel riepilogo e in
+  `_FileList.csv` come "OK (riscritto dalla sincronizzazione)".
+- **Versioni vecchie sempre eliminate**: Windows rifiuta di eliminare cartelle con l'attributo di sola
+  lettura, che la sincronizzazione mette su alcune cartelle. Ora l'attributo viene tolto e
+  l'eliminazione riprovata, così `_Versions` non cresce oltre il numero di versioni scelto.
+- **Esito dell'ultimo backup automatico nella finestra**: all'apertura compare nel registro e accanto a
+  "Pianifica" (data e riuscito/non riuscito); un clic sulla scritta apre il registro completo.
+
 ## 2026-09-22 — Link alla pagina del programma
 
 - **In basso a destra nella finestra** ora ci sono la versione e il link alla pagina del programma

@@ -51,6 +51,7 @@ import os
 import queue
 import re
 import shutil
+import stat
 import sqlite3
 import subprocess
 import sys
@@ -112,6 +113,7 @@ DEFAULTS = {
     "language": "auto",   # "auto" (lingua di Windows), "it" o "en"
     "include_new": True,  # aggiunge da solo al backup le cartelle nuove di primo livello
     "installer_language": "",  # ultima lingua scelta nell'installer MSI, già applicata
+    "last_scheduled": {},  # esito dell'ultimo backup automatico: {when, ok, text}
 }
 
 
@@ -344,6 +346,12 @@ EN: dict[str, str] = {
     "Copia anche le cartelle nuove che compariranno su SharePoint":
         "Also back up new folders that appear on SharePoint",
     "Backup giornaliero di SPVault": "SPVault daily backup",
+    " - ultimo automatico {when}: {result}": " - last automatic backup {when}: {result}",
+    "riuscito": "succeeded",
+    "non riuscito": "failed",
+    "Ultimo backup automatico ({when}):": "Last automatic backup ({when}):",
+    "OK (riscritto dalla sincronizzazione)": "OK (rewritten by the sync)",
+    ", {count} riscritti dalla sincronizzazione": ", {count} rewritten by the sync",
     "Backup pianificato ogni giorno alle {time}. Se a quell'ora il PC è spento, parte appena lo riaccendi.":
         "Backup scheduled every day at {time}. If the PC is off at that time, it starts as soon as "
         "you turn it back on.",
@@ -519,6 +527,45 @@ def onedrive_roots() -> list[str]:
 def in_onedrive(path) -> bool:
     p = os.path.normcase(os.path.abspath(path))
     return any(p == r or p.startswith(r + os.sep) for r in onedrive_roots())
+
+
+def clear_read_only(path) -> bool:
+    """Toglie l'attributo di sola lettura. Windows rifiuta di eliminare cartelle e file che ce
+    l'hanno, e OneDrive lo mette su alcune cartelle sincronizzate. True se l'attributo c'era."""
+    try:
+        mode = os.stat(lp(path)).st_mode
+        if mode & stat.S_IWRITE:
+            return False
+        os.chmod(lp(path), mode | stat.S_IWRITE)
+    except OSError:
+        return False
+    return True
+
+
+def remove_tree(path):
+    """Elimina una cartella con tutto il contenuto, togliendo la sola lettura dove blocca."""
+    def retry(func, name, error):
+        if isinstance(error, PermissionError) and clear_read_only(name):
+            func(name)
+        else:
+            raise error
+
+    shutil.rmtree(lp(path), onexc=retry)
+
+
+def remove_empty_dir(path) -> bool:
+    """Elimina una cartella vuota (togliendo la sola lettura se serve). False se non si può."""
+    for attempt in (1, 2):
+        try:
+            os.rmdir(lp(path))
+        except PermissionError:
+            if attempt == 2 or not clear_read_only(path):
+                return False
+        except OSError:
+            return False
+        else:
+            return True
+    return False
 
 
 def label_key(name: str):
@@ -1126,6 +1173,7 @@ class Backup:
         self.label = next_label(self.root)
         self.complete = False  # True solo se la verifica finale trova tutto
         self.hidden: list[tuple[str, int, int]] = []  # (cartella, elementi, byte) non visibili
+        self.resynced: set[str] = set()  # file riscritti dalla sincronizzazione dopo la copia
         self._ui_log = log
         self._file = None
         self._file_lock = threading.Lock()
@@ -1202,6 +1250,8 @@ class Backup:
                    label=self.label, downloaded=stats["scaricati"], size=fmt_size(stats["byte"]),
                    unchanged=stats["invariati"], moved=stats["spostati"], archived=stats["archiviati"],
                    versions=VERSIONS_DIR)
+                + (tr(", {count} riscritti dalla sincronizzazione", count=stats["risincronizzati"])
+                   if stats["risincronizzati"] else "")
                 + (tr(", {errors} errori di download", errors=stats["errori"]) if stats["errori"] else "")
                 + f"\n{verdict}")
 
@@ -1329,8 +1379,13 @@ class Backup:
                         "quickXorHash", tr("Stato"), tr("Verifica {label}", label=self.label)])
             for f in sorted(files.values(), key=lambda f: f.path.casefold()):
                 modified = datetime.fromtimestamp(f.mtime).strftime("%d/%m/%Y %H:%M:%S") if f.mtime else ""
-                w.writerow([f.path, f.size, modified, f.hash or "",
-                            tr("MANCANTE") if f.id in missing_ids else "OK"])
+                if f.id in missing_ids:
+                    stato = tr("MANCANTE")
+                elif f.id in self.resynced:
+                    stato = tr("OK (riscritto dalla sincronizzazione)")
+                else:
+                    stato = "OK"
+                w.writerow([f.path, f.size, modified, f.hash or "", stato])
             for rel, count, size in self.hidden:
                 w.writerow([tr("{folder}/ (contenuto non visibile)", folder=rel), size, "", "",
                             tr("NON ACCESSIBILE ({count} elementi)", count=count)])
@@ -1380,6 +1435,15 @@ class Backup:
             if self._in_backup(f, b):
                 if not moved:
                     stats["invariati"] += 1
+                continue
+            if b and b.path == f.path and b.same_content(f) and file_size(target) is not None:
+                # su SharePoint il file non è cambiato, ma la copia locale sì: succede con i file
+                # Office, perché dopo l'upload SharePoint ne riscrive i metadati e la
+                # sincronizzazione riporta indietro la copia modificata. Riscaricarli sarebbe
+                # inutile: il giorno dopo si ripeterebbe tutto da capo.
+                state.record(b, file_size(target))
+                self.resynced.add(f.id)
+                stats["risincronizzati"] += 1
                 continue
             if b is None:
                 st = None
@@ -1578,8 +1642,7 @@ class Backup:
                     self.log(tr("✗ {path} (non presente su SharePoint: spostato in {folder})",
                                 path=rel, folder=VERSIONS_DIR))
             if rel_root and rel_root.casefold() not in keep_dirs:
-                with contextlib.suppress(OSError):
-                    os.rmdir(root)
+                remove_empty_dir(root)
 
     def _prune(self, folder: Path, keep: int, dirs: bool):
         """Tiene solo le ultime `keep` etichette (versioni o log)."""
@@ -1590,7 +1653,7 @@ class Backup:
         for name in sorted(names, key=label_key)[:max(0, len(names) - keep)]:
             try:
                 if dirs:
-                    shutil.rmtree(lp(folder / name))
+                    remove_tree(folder / name)
                     self.log(tr("Eliminata la versione più vecchia: {name}", name=name))
                 else:
                     os.remove(lp(folder / name))
@@ -1704,6 +1767,7 @@ class App:
         self._show_items(self.cfg["known_items"])
         self._show_account()
         self._refresh_schedule()
+        self._show_last_scheduled()
         self.var_url.trace_add("write", self._on_url_change)
         root.protocol("WM_DELETE_WINDOW", self._on_close)
         root.after(100, self._poll_events)
@@ -1773,7 +1837,9 @@ class App:
         ttk.Entry(sched, textvariable=self.var_time, width=6).pack(side="left", padx=4)
         ttk.Button(sched, text=tr("Pianifica"), command=self._schedule).pack(side="left")
         ttk.Button(sched, text=tr("Rimuovi"), command=self._unschedule).pack(side="left", padx=6)
-        ttk.Label(sched, textvariable=self.var_sched, foreground="gray").pack(side="left")
+        self.lbl_sched = ttk.Label(sched, textvariable=self.var_sched, foreground="gray", cursor="hand2")
+        self.lbl_sched.pack(side="left")
+        self.lbl_sched.bind("<Button-1>", lambda _event: self._open_scheduled_log())
         # in basso a destra: versione e pagina del programma, cliccabile
         self.link = ttk.Label(sched, text=f"SPVault {__version__} · {WEBSITE.split('://', 1)[1]}",
                               foreground="#2563EB", cursor="hand2", font=("Segoe UI", 8, "underline"))
@@ -1998,7 +2064,28 @@ class App:
         r = subprocess.run(["schtasks", "/Query", "/TN", TASK_NAME, "/FO", "LIST"],
                            capture_output=True, text=True,
                            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        self.var_sched.set(tr("(attivo)") if r.returncode == 0 else tr("(non pianificato)"))
+        state = tr("(attivo)") if r.returncode == 0 else tr("(non pianificato)")
+        last = self.cfg.get("last_scheduled") or {}
+        if last.get("when"):  # il backup automatico gira senza finestra: qui si vede com'è andato
+            when = datetime.fromtimestamp(last["when"])
+            state += tr(" - ultimo automatico {when}: {result}", when=f"{when:%d/%m %H:%M}",
+                        result=tr("riuscito") if last.get("ok") else tr("non riuscito"))
+        self.var_sched.set(state)
+
+    def _show_last_scheduled(self):
+        """All'apertura scrive nel registro della finestra l'esito dell'ultimo backup automatico."""
+        last = self.cfg.get("last_scheduled") or {}
+        if last.get("when"):
+            when = datetime.fromtimestamp(last["when"])
+            self._append_log(tr("Ultimo backup automatico ({when}):", when=f"{when:%d/%m/%Y %H:%M}"))
+            for line in str(last.get("text", "")).splitlines():
+                self._append_log(f"  {line}")
+
+    def _open_scheduled_log(self):
+        """Apre il registro completo dei backup automatici (clic sulla scritta accanto a Pianifica)."""
+        if SCHEDULED_LOG.exists():
+            with contextlib.suppress(OSError):
+                os.startfile(SCHEDULED_LOG)
 
     # --- GUI
 
@@ -2137,6 +2224,13 @@ class App:
 
 # -------------------------------------------------------------- avvio pianificato
 
+def remember_last_scheduled(summary: str, ok: bool):
+    """Salva l'esito dell'ultimo backup automatico: la finestra lo mostra al successivo avvio."""
+    cfg = load_config()  # riletta: il backup può averla aggiornata (cartelle nuove)
+    cfg["last_scheduled"] = {"when": time.time(), "ok": ok, "text": summary}
+    save_config(cfg)
+
+
 def run_scheduled() -> int:
     """Backup senza finestra (Utilità di pianificazione). Non apre mai il browser
     in modo visibile: se serve il login mostra un avviso."""
@@ -2154,6 +2248,7 @@ def run_scheduled() -> int:
                           "Apri SPVault, incolla il link della libreria o della cartella e scegli la cartella "
                           "di backup.")
                 log(text)
+                remember_last_scheduled(text, False)
                 message_box(text)
                 return 1
 
@@ -2166,11 +2261,13 @@ def run_scheduled() -> int:
             summary, complete = run_backup(cfg, log, lambda d, t: None, threading.Event(),
                                            interactive_login=False, on_connected=refresh_items)
             log(summary)
+            remember_last_scheduled(summary, complete)
             if not complete:
                 message_box(summary)
             return 0 if complete else 1
         except Exception as e:
             log(tr("ERRORE: {error}", error=e))
+            remember_last_scheduled(tr("ERRORE: {error}", error=e), False)
             text = (tr("Il backup pianificato non è partito perché la sessione SharePoint è scaduta.\n"
                        'Apri SPVault e premi "Connetti".')
                     if isinstance(e, LoginRequired) else tr("Backup SharePoint non riuscito:\n{error}", error=e))
